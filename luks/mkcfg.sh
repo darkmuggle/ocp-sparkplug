@@ -122,7 +122,13 @@ mkunits() {
     cat <<END
     systemd:
       units:
+END
+    if [ "${1:-}" == "autologin" ]; then
+    cat <<END
 $(mklogin)
+END
+    fi
+cat <<END
         - name: clevis-unlock@.service
           enabled: false
           contents: |-
@@ -165,7 +171,6 @@ $(mklogin)
 
             [Install]
             WantedBy=remote-fs.target
-##        mount point         raid-name
 $(mkmount var/lib/containers vlc-raid0)
 $(mkmount var/opt/data data-raid1)
     storage:
@@ -211,5 +216,5 @@ END
 
 case ${1:-mco} in
     mco) mkmco; mkunits;;
-    ign) (mkign; mkunits) | sed -e "s/^    //g";
+    ign) (mkign; mkunits autologin) | sed -e "s/^    //g";
 esac
